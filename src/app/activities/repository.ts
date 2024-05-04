@@ -4,6 +4,7 @@ import { auth } from "~/lib/auth";
 
 export type ActivityRepository = {
   findById({ activityId }: { activityId: Activity["id"] }): Promise<Activity>;
+  findAllFull(): Promise<Activity[]>;
   findAll({
     order,
     date,
@@ -39,6 +40,15 @@ export const repository: ActivityRepository = {
     const result =
       await sql`SELECT * FROM activities WHERE "userId" = ${session.user.id} AND id = ${activityId}`;
     return result.rows[0] as unknown as Activity;
+  },
+
+  async findAllFull() {
+    const session = await auth();
+    const result = await sql.query(
+      `SELECT * FROM activities WHERE "userId" = ${session.user.id} ORDER BY created_at DESC`,
+    );
+
+    return result.rows as unknown as Activity[];
   },
 
   async findAll({ order, date }) {

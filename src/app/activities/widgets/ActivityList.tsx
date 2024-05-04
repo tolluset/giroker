@@ -1,3 +1,5 @@
+"use client";
+
 import ListCard from "../features/ListCard";
 import { Activity } from "../model";
 

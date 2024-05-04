@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { ActivityRepository } from "./repository";
 
-type Status = "idle" | "playing" | "stopped";
+export type Status = "idle" | "playing" | "stopped";
 
-type Activity = {
+export type Activity = {
   id: string;
   userId: string;
   name: string;
@@ -15,9 +15,9 @@ type Activity = {
   status: Status;
 };
 
-type ActivitySchema = z.infer<typeof activitySchema>;
+export type ActivitySchema = z.infer<typeof activitySchema>;
 
-const activitySchema = z.object({
+export const activitySchema = z.object({
   name: z
     .string()
     .min(1, { message: "1자 이상으로 설정해주세요" })
@@ -25,9 +25,9 @@ const activitySchema = z.object({
   description: z.string().max(300, { message: "300자 이하로 설정해주세요" }),
 });
 
-const ACTIVITES = "activities";
+export const ACTIVITES = "activities";
 
-async function getActivity({
+export async function getActivity({
   activityId,
   repository,
 }: {
@@ -39,7 +39,16 @@ async function getActivity({
   return result;
 }
 
-async function getActivities({
+export async function getActivitiesFull({
+  repository,
+}: {
+  repository: ActivityRepository;
+}) {
+  const result = await repository.findAllFull();
+  return result;
+}
+
+export async function getActivities({
   order = "desc",
   date,
   repository,
@@ -69,7 +78,7 @@ async function getActivities({
   return result;
 }
 
-async function createActivity({
+export async function createActivity({
   activity,
   repository,
 }: {
@@ -89,7 +98,7 @@ export async function updateActivity({
   await repository.update({ activity });
 }
 
-async function startActivity({
+export async function startActivity({
   activityId,
   repository,
 }: {
@@ -102,7 +111,7 @@ async function startActivity({
   });
 }
 
-async function stopActivity({
+export async function stopActivity({
   activityId,
   repository,
 }: {
@@ -111,15 +120,3 @@ async function stopActivity({
 }) {
   await repository.stop({ activityId, stoppedAt: Date.now() / 1000.0 });
 }
-
-export {
-  type Activity,
-  type ActivitySchema,
-  activitySchema,
-  ACTIVITES,
-  getActivity,
-  getActivities,
-  createActivity,
-  startActivity,
-  stopActivity,
-};
