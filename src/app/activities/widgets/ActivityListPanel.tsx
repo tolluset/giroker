@@ -5,6 +5,8 @@ import AddButton from "../features/AddButton";
 import DateController from "../features/DateController";
 import { Activity } from "../model";
 import ActivityList from "./ActivityList";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 export type ControllDateCursor = "calendar" | "yesterday" | "tomorrow";
 
@@ -17,6 +19,9 @@ export default function ActivityListPanel({
 }) {
   return (
     <div className="flex flex-col items-center w-full gap-y-4">
+      <Button variant="outline">
+        <Link href="/activities">전체 보기</Link>
+      </Button>
       <DateController date={date} />
       <CurrentTaskTime activities={activities} />
       <hr className="text-gray-500 w-full" />

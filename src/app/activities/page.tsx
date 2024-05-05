@@ -8,9 +8,7 @@ export default async function ActivitiesPage() {
 
   return (
     <BasicLayout>
-      <div>
-        <ActivityList activities={activities} />
-      </div>
+      <ActivityList activities={activities} />
     </BasicLayout>
   );
 }
