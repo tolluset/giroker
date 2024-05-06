@@ -1,10 +1,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  reStartActivityAction,
   startActivityAction,
   stopActivityAction,
 } from "~/app/activities/action";
-import { Activity } from "~/app/activities/model";
+import { Status } from "~/app/activities/model";
 
 /**
  * ```ts
@@ -15,22 +16,22 @@ import { Activity } from "~/app/activities/model";
  */
 export default function useTimer({
   now,
-  activity,
+  activityStatus,
 }: {
   now: number;
-  activity: Activity;
+  activityStatus: Status;
 }) {
   const [time, setTime] = useState(now / 1000);
   const [id, setId] = useState<NodeJS.Timeout>();
   const [status, setStatus] = useState<"play" | "pause">(
-    activity.status === "playing" ? "play" : "pause",
+    activityStatus === "playing" ? "play" : "pause",
   );
 
   const params = useParams();
   const activityId = params["activity-id"] as string;
 
   useEffect(() => {
-    if (activity.status !== "playing") {
+    if (activityStatus !== "playing") {
       return;
     }
 
@@ -45,7 +46,7 @@ export default function useTimer({
         clearInterval(id);
       }
     };
-  }, [activity.status, activityId]);
+  }, [activityStatus]);
 
   const secondsToHHMMSS = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -55,12 +56,12 @@ export default function useTimer({
   };
 
   const start = () => {
-    const id = setInterval(() => {
-      setTime((time) => time + 1);
-    }, 1000);
-
-    setId(id);
     setStatus("play");
+
+    if (activityStatus === "stopped") {
+      reStartActivityAction({ activityId });
+      return;
+    }
 
     startActivityAction({ activityId });
   };

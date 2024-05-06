@@ -6,7 +6,7 @@ import DateController from "../features/DateController";
 import { Activity } from "../model";
 import ActivityList from "./ActivityList";
 import { Button } from "~/components/ui/button";
-import Link from "next/link";
+import useTimer from "~/hooks/useTimer";
 
 export type ControllDateCursor = "calendar" | "yesterday" | "tomorrow";
 
@@ -20,7 +20,7 @@ export default function ActivityListPanel({
   return (
     <div className="flex flex-col items-center w-full gap-y-4">
       <Button variant="outline">
-        <Link href="/activities">전체 보기</Link>
+        <a href="/activities">전체 보기</a>
       </Button>
       <DateController date={date} />
       <CurrentTaskTime activities={activities} />
@@ -31,20 +31,54 @@ export default function ActivityListPanel({
 }
 
 function CurrentTaskTime({ activities }: { activities: Activity[] }) {
+  const earliestActivity = activities.reduce((earliest, current) => {
+    if (!earliest.started_at) {
+      return current;
+    }
+
+    if (!current.started_at) {
+      return earliest;
+    }
+
+    if (
+      !earliest ||
+      new Date(current?.started_at).getTime() <
+        new Date(earliest.started_at).getTime()
+    ) {
+      return current;
+    }
+
+    return earliest;
+  }, activities[0]);
+
+  const activitiedTime = activities.reduce((time, activity) => {
+    return activity.stopped_at && activity.started_at
+      ? time +
+          (new Date(activity.stopped_at).getTime() -
+            new Date(activity.started_at!).getTime())
+      : time;
+  }, 0);
+
+  const isPlaying = activities.some(
+    (activity) => activity.status === "playing",
+  );
+
+  const now =
+    activitiedTime +
+    Date.now() -
+    new Date(earliestActivity.started_at ?? 0).getTime();
+
+  const { time } = useTimer({
+    now,
+    activityStatus: isPlaying ? "playing" : "idle",
+  });
+
   return (
     <div className="text-center">
       <p className="text-gray-500 text-sm ">현재 작업 시간</p>
-      <p className="text-2xl">
-        {milliSecondsToHHMMSS(
-          activities.reduce((time, activity) => {
-            return activity.stopped_at && activity.started_at
-              ? time +
-                  (new Date(activity.stopped_at).getTime() -
-                    new Date(activity.started_at!).getTime())
-              : time;
-          }, 0),
-        )}
-      </p>
+      <span suppressHydrationWarning className="text-2xl">
+        {time}
+      </span>
     </div>
   );
 }
@@ -64,11 +98,3 @@ function AddButtonAndActivityList({ activities }: { activities: Activity[] }) {
     </>
   );
 }
-
-const milliSecondsToHHMMSS = (milliSeconds: number) => {
-  const seconds = milliSeconds / 1000;
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  return [h, m, s].map((v) => (v < 10 ? "0" + v : v)).join(":");
-};

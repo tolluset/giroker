@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import QueryClientProvider from "~/lib/QueryClientProvider";
 
@@ -17,7 +16,6 @@ export default function RootLayout({
     <html lang="kr">
       <body>
         <main>
-          <NextTopLoader showSpinner={false} />
           <QueryClientProvider>{children}</QueryClientProvider>
         </main>
       </body>

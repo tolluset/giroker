@@ -10,7 +10,7 @@ export default function Timer({ activity }: { activity: Activity }) {
 
   const { time, status, toggleTimer } = useTimer({
     now,
-    activity,
+    activityStatus: activity.status,
   });
 
   return (
