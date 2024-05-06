@@ -34,12 +34,12 @@ export default function ListCard({ activity }: { activity: Activity }) {
         <CardContent>
           {activity.started_at && (
             <p className="text-gray-500 text-xs">
-              시작시각: {HHMMSS(activity.started_at)}
+              시작 {displayDate(activity.started_at)}
             </p>
           )}
           {activity.stopped_at && (
             <p className="text-gray-500 text-xs">
-              종료시각: {HHMMSS(activity.stopped_at)}
+              종료 {displayDate(activity.stopped_at)}
             </p>
           )}
         </CardContent>
@@ -55,9 +55,13 @@ export default function ListCard({ activity }: { activity: Activity }) {
   );
 }
 
-const HHMMSS = (dateString: string) => {
+const displayDate = (dateString: string) => {
   const date = new Date(dateString);
   date.setHours(date.getHours() + 9);
 
-  return date.toISOString().substring(11, 19);
+  return date
+    .toISOString()
+    .substring(0, 19)
+    .replace("T", " ")
+    .replaceAll("-", ".");
 };

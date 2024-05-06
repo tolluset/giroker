@@ -3,6 +3,8 @@ import { ActivityRepository } from "./repository";
 
 export type Status = "idle" | "playing" | "stopped";
 
+export type ActivityId = Activity["id"];
+
 export type Activity = {
   id: string;
   userId: string;
@@ -31,7 +33,7 @@ export async function getActivity({
   activityId,
   repository,
 }: {
-  activityId: Activity["id"];
+  activityId: ActivityId;
   repository: ActivityRepository;
 }) {
   const result = await repository.findById({ activityId });
@@ -102,7 +104,7 @@ export async function startActivity({
   activityId,
   repository,
 }: {
-  activityId: Activity["id"];
+  activityId: ActivityId;
   repository: ActivityRepository;
 }) {
   await repository.start({
@@ -111,11 +113,21 @@ export async function startActivity({
   });
 }
 
+export async function reStartActivity({
+  activityId,
+  repository,
+}: {
+  activityId: ActivityId;
+  repository: ActivityRepository;
+}) {
+  await repository.reStart({ activityId });
+}
+
 export async function stopActivity({
   activityId,
   repository,
 }: {
-  activityId: Activity["id"];
+  activityId: ActivityId;
   repository: ActivityRepository;
 }) {
   await repository.stop({ activityId, stoppedAt: Date.now() / 1000.0 });

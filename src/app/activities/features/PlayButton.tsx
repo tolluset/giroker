@@ -2,7 +2,7 @@ import React from "react";
 import { PlayIcon } from "~/components/icons";
 import { Button } from "~/components/ui/button";
 import { Activity } from "../model";
-import { startActivityAction } from "../action";
+import { reStartActivityAction, startActivityAction } from "../action";
 
 export default function PlayButton(
   props: React.ComponentPropsWithoutRef<"button"> & { activity: Activity },
@@ -11,6 +11,12 @@ export default function PlayButton(
 
   const startActivity = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    if (activity.status === "stopped") {
+      reStartActivityAction({ activityId: activity.id });
+      return;
+    }
+
     startActivityAction({ activityId: activity.id });
   };
 

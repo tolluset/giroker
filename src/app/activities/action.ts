@@ -7,6 +7,8 @@ import {
   updateActivity,
   startActivity,
   stopActivity,
+  ActivityId,
+  reStartActivity,
 } from "./model";
 import { repository } from "./repository";
 
@@ -27,9 +29,22 @@ export async function updateActivityAction({
 export async function startActivityAction({
   activityId,
 }: {
-  activityId: Activity["id"];
+  activityId: ActivityId;
 }) {
   await startActivity({
+    activityId,
+    repository,
+  });
+
+  revalidatePath("/");
+}
+
+export async function reStartActivityAction({
+  activityId,
+}: {
+  activityId: ActivityId;
+}) {
+  await reStartActivity({
     activityId,
     repository,
   });
@@ -40,7 +55,7 @@ export async function startActivityAction({
 export async function stopActivityAction({
   activityId,
 }: {
-  activityId: Activity["id"];
+  activityId: ActivityId;
 }) {
   await stopActivity({
     activityId,

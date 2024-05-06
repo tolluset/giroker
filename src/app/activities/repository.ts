@@ -1,9 +1,9 @@
 import { sql } from "@vercel/postgres";
-import { Activity } from "./model";
+import { Activity, ActivityId } from "./model";
 import { auth } from "~/lib/auth";
 
 export type ActivityRepository = {
-  findById({ activityId }: { activityId: Activity["id"] }): Promise<Activity>;
+  findById({ activityId }: { activityId: ActivityId }): Promise<Activity>;
   findAllFull(): Promise<Activity[]>;
   findAll({
     order,
@@ -21,14 +21,15 @@ export type ActivityRepository = {
     activityId,
     startedAt,
   }: {
-    activityId: Activity["id"];
+    activityId: ActivityId;
     startedAt: number;
   }): Promise<void>;
+  reStart({ activityId }: { activityId: ActivityId }): Promise<void>;
   stop({
     activityId,
     stoppedAt,
   }: {
-    activityId: Activity["id"];
+    activityId: ActivityId;
     stoppedAt: number;
   }): Promise<void>;
 };
@@ -94,6 +95,15 @@ export const repository: ActivityRepository = {
                          started_at = to_timestamp(${startedAt})
                      WHERE "userId" = ${session.user.id}
                            AND id = ${activityId}`;
+  },
+
+  async reStart({ activityId }) {
+    const session = await auth();
+    await sql`UPDATE activities
+                   SET status = 'playing',
+                       stopped_at = NULL
+                   WHERE "userId" = ${session.user.id}
+                         AND id = ${activityId}`;
   },
 
   async stop({ activityId, stoppedAt }) {
