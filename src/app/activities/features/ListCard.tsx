@@ -9,7 +9,6 @@ import {
 import PlayButton from "./PlayButton";
 import { type Activity } from "../model";
 import StopButton from "./StopButton";
-import Link from "next/link";
 import { cn } from "~/lib/utils";
 
 export default function ListCard({ activity }: { activity: Activity }) {
@@ -17,7 +16,7 @@ export default function ListCard({ activity }: { activity: Activity }) {
   const disabledTabIndex = disabled ? -1 : 0;
 
   return (
-    <Link
+    <a
       href={`/activities/${activity.id}`}
       tabIndex={disabledTabIndex}
       aria-disabled={disabled}
@@ -51,7 +50,7 @@ export default function ListCard({ activity }: { activity: Activity }) {
           )}
         </CardFooter>
       </Card>
-    </Link>
+    </a>
   );
 }
 

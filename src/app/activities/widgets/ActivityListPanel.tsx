@@ -31,6 +31,10 @@ export default function ActivityListPanel({
 }
 
 function CurrentTaskTime({ activities }: { activities: Activity[] }) {
+  const isPlaying = activities.some(
+    (activity) => activity.status === "playing",
+  );
+
   const earliestActivity = activities.reduce((earliest, current) => {
     if (!earliest.started_at) {
       return current;
@@ -59,14 +63,11 @@ function CurrentTaskTime({ activities }: { activities: Activity[] }) {
       : time;
   }, 0);
 
-  const isPlaying = activities.some(
-    (activity) => activity.status === "playing",
-  );
+  const timeFromEarliest = isPlaying
+    ? Date.now() - new Date(earliestActivity.started_at ?? 0).getTime()
+    : 0;
 
-  const now =
-    activitiedTime +
-    Date.now() -
-    new Date(earliestActivity.started_at ?? 0).getTime();
+  const now = activitiedTime + timeFromEarliest;
 
   const { time } = useTimer({
     now,
